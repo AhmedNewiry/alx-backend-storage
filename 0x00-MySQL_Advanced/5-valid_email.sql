@@ -1,14 +1,15 @@
--- Initial setup: Create users table and insert initial data
-DROP TABLE IF EXISTS users;
+-- Create a trigger that resets valid_email if the email is changed
+DELIMITER //
 
-CREATE TABLE IF NOT EXISTS users (
-    id INT NOT NULL AUTO_INCREMENT,
-    email VARCHAR(255) NOT NULL,
-    name VARCHAR(255),
-    valid_email BOOLEAN NOT NULL DEFAULT 0,
-    PRIMARY KEY (id)
-);
+CREATE TRIGGER before_update_email
+BEFORE UPDATE ON users
+FOR EACH ROW
+BEGIN
+    -- Check if the email is being changed
+    IF NEW.email <> OLD.email THEN
+        -- Reset valid_email to 0 if the email is changed
+        SET NEW.valid_email = 0;
+    END IF;
+END //
 
-INSERT INTO users (email, name) VALUES ("bob@dylan.com", "Bob");
-INSERT INTO users (email, name, valid_email) VALUES ("sylvie@dylan.com", "Sylvie", 1);
-INSERT INTO users (email, name, valid_email) VALUES ("jeanne@dylan.com", "Jeanne", 1);
+DELIMITER ;
