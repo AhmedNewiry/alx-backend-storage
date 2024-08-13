@@ -20,4 +20,4 @@ def insert_school(mongo_collection, **kwargs):
     # Insert the document and get the result
     result = mongo_collection.insert_one(kwargs)
     # Return the _id of the new document
-    return str(result.inserted_id)
+    return result.inserted_id
