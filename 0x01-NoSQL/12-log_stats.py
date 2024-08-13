@@ -5,7 +5,13 @@ Script to provide stats about Nginx logs stored in MongoDB.
 
 from pymongo import MongoClient
 
+
+
 def log_stats():
+    """
+        provide stats about nginx
+        logs stored in mongodb
+    """
     # Connect to the MongoDB server
     client = MongoClient('mongodb://127.0.0.1:27017')
     
