@@ -6,10 +6,12 @@ Module: MongoDB Document Insertion
 
 def insert_school(mongo_collection, **kwargs):
     """
-    Insert a new document with the specified attributes into the provided MongoDB collection.
+    Insert a new document with the specified attributes
+    into the provided MongoDB collection.
 
     Parameters:
-    mongo_collection (pymongo.collection.Collection): The pymongo collection object.
+    mongo_collection (pymongo.collection.Collection):
+    The pymongo collection object.
     **kwargs: Attributes of the document to be inserted.
 
     Returns:
