@@ -21,7 +21,8 @@ class Cache:
         Store the data in Redis using a randomly generated key.
 
         Args:
-            data: The data to store, which can be of type str, bytes, int, or float.
+            data: The data to store, which can be of
+            type str, bytes, int, or float.
 
         Returns:
             The randomly generated key as a string.
@@ -30,13 +31,16 @@ class Cache:
         self._redis.set(key, data)  # Store the data in Redis using the key
         return key  # Return the generated key
 
-        def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float, None]:
+    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float, None]:
         """
-        Retrieve data from Redis and optionally convert it back to the desired format using fn.
+        Retrieve data from Redis and optionally convert it
+        back to the desired format using fn.
 
         :param key: The key to retrieve data from Redis.
-        :param fn: An optional callable that will be used to convert the data back to the desired format.
-        :return: The retrieved data, converted by fn if provided, or None if the key does not exist.
+        :param fn: An optional callable that will be used to
+        convert the data back to the desired format.
+        :return: The retrieved data, converted by fn if provided,
+        or None if the key does not exist.
         """
         data = self._redis.get(key)
         if data is None:
@@ -59,6 +63,7 @@ class Cache:
         Retrieve data as an integer.
 
         :param key: The key to retrieve data from Redis.
-        :return: The data as an integer, or None if the key does not exist.
+        :return: The data as an integer,
+        or None if the key does not exist.
         """
         return self.get(key, fn=int)
