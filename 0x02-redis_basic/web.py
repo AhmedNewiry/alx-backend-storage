@@ -45,6 +45,7 @@ def data_cacher(method: Callable) -> Callable:
 
         # Fetch the data, cache it, and return the result
         result = method(url)
+        redis_store.set(f'count:{url}', 0)
         redis_store.setex(f'result:{url}', 10, result)
         return result
 
