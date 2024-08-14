@@ -1,56 +1,67 @@
 #!/usr/bin/env python3
-"""
-This module defines a function to fetch the HTML content of a URL w
-"""
+'''
+This module provides functionality to cache HTTP requests
+'''
 
-import requests
 import redis
+import requests
+from functools import wraps
 from typing import Callable
 
-
-# Initialize Redis connection
+# Initialize a Redis client instance for caching and tracking
 redis_store = redis.Redis()
 
 
-def cache_page(fn: Callable) -> Callable:
-    """
-    Decorator that caches the page content and tracks the access count.
+def data_cacher(method: Callable) -> Callable:
+    '''
+    A decorator that caches the output of an HTTP GET request and tracks
+    the number of times the URL has been accessed.
 
     Args:
-        fn (Callable): The function to be decorated.
+        method (Callable): The function to be decorated.
 
     Returns:
-        Callable: The wrapped function.
-    """
-    def wrapper(url: str) -> str:
-        # Track access count
-        redis_store.incr(f"count:{url}")
+        Callable: The wrapped function with caching and tracking functionality.
+    '''
+    @wraps(method)
+    def invoker(url: str) -> str:
+        '''
+        Wrapper function that handles the caching of the HTTP GET request
+        response and tracks the access count.
 
-        # Check if cached content exists
-        cached_page = redis_store.get(f"cached:{url}")
-        if cached_page:
-            return cached_page.decode('utf-8')
+        Args:
+            url (str): The URL to fetch the content from.
 
-        # Fetch the page using the decorated function
-        html_content = fn(url)
+        Returns:
+            str: The content of the URL, either from cache or a fresh request.
+        '''
+        # Increment the access count for the URL
+        redis_store.incr(f'count:{url}')
 
-        # Cache the content with an expiration time of 10 seconds
-        redis_store.setex(f"cached:{url}", 10, html_content)
+        # Check if the result is already cached
+        result = redis_store.get(f'result:{url}')
+        if result:
+            return result.decode('utf-8')
 
-        return html_content
-    return wrapper
+        # Fetch the data, cache it, and return the result
+        result = method(url)
+        redis_store.setex(f'result:{url}', 10, result)
+        return result
+
+    return invoker
 
 
-@cache_page
+@data_cacher
 def get_page(url: str) -> str:
-    """
-    Fetches the HTML content of a URL.
+    '''
+    Fetches the HTML content of the specified URL, caches the result,
+    and tracks how many times the URL has been accessed.
 
     Args:
-        url (str): The URL to fetch the content from.
+        url (str): The URL to retrieve content from.
 
     Returns:
         str: The HTML content of the URL.
-    """
+    '''
     response = requests.get(url)
     return response.text
