@@ -36,24 +36,25 @@ def call_history(method: Callable) -> Callable:
         return result
     return wrapper
 
+
 def replay(method: Callable) -> None:
     """Displays the call history of a Cache class' method."""
-    # Get the Cache instance and Redis keys
-    cache = method.__self__
+    cache = method.__self__  # Get the Cache instance
+    redis_store = cache._redis  # Access the Redis instance
+    # Construct keys for inputs and outputs
     inputs_key = f"{method.__qualname__}:inputs"
     outputs_key = f"{method.__qualname__}:outputs"
-    # Check if Redis connection and Cache instance are valid
-    if not isinstance(cache._redis, redis.Redis):
-        return
     # Retrieve inputs and outputs from Redis
-    inputs = cache._redis.lrange(inputs_key, 0, -1)
-    outputs = cache._redis.lrange(outputs_key, 0, -1)
+    inputs = redis_store.lrange(inputs_key, 0, -1)
+    outputs = redis_store.lrange(outputs_key, 0, -1)
     # Print the number of times the method was called
     print(f"{method.__qualname__} was called {len(inputs)} times:")
     # Iterate through inputs and outputs and print them
     for inp, outp in zip(inputs, outputs):
-        # Use str() for input to avoid security issues with eval
-        print(f"{method.__qualname__}(*{inp.decode('utf-8')}) -> {outp.decode('utf-8')}")
+        # Decode byte data and format for output
+        decoded_input = inp.decode('utf-8')
+        decoded_output = outp.decode('utf-8')
+        print(f"{method.__qualname__}(*{decoded_input}) -> {decoded_output}")
 
 
 class Cache:
