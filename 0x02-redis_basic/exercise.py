@@ -15,7 +15,8 @@ def count_calls(method: Callable) -> Callable:
     @wraps(method)
     def wrapper(self, *args, **kwargs):
         # Increment the count in Redis for the method's qualified name
-        self._redis.incr(method.__qualname__)
+        if isinstance(self._redis, redis.Redis):
+            self._redis.incr(method.__qualname__)
         # Call the original method
         return method(self, *args, **kwargs)
     return wrapper
