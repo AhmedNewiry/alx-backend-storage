@@ -11,7 +11,8 @@ from typing import Union
 class Cache:
     def __init__(self):
         """
-        Initialize the Cache instance with a Redis client and flush the database.
+        Initialize the Cache instance with a
+        Redis client and flush the database.
         """
         self._redis = redis.Redis()
         self._redis.flushdb()
@@ -31,7 +32,11 @@ class Cache:
         self._redis.set(key, data)  # Store the data in Redis using the key
         return key  # Return the generated key
 
-    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float, None]:
+    def get(
+        self,
+        key: str,
+        fn: Optional[Callable] = None
+    ) -> Union[str, bytes, int, float, None]:
         """
         Retrieve data from Redis and optionally convert it
         back to the desired format using fn.
